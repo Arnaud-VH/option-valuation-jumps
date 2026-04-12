@@ -22,7 +22,8 @@ def merton_analytical(S0, K, T, r, sigma, lam, mu_J, sigma_J, n_terms=5):
    """
    zeta = exp(mu_J + 0.5 * sigma_J**2) - 1.0
    lam_prime = lam * (1.0 + zeta)
-   price = 0.0
+   S0 = np.asarray(S0)
+   price = np.zeros_like(S0, dtype=float)
 
    for m in range(n_terms):
       poisson_weight = (exp(-lam_prime * T) * (lam_prime * T)**m / factorial(m))
