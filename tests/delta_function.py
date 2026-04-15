@@ -2,6 +2,8 @@ from models.merton import merton_analytical
 from merton_numerical_class import MertonNumericalClass
 import numpy as np
 import matplotlib.pyplot as plt
+
+# Compare numerical results with the analytical solution when available.
 n = 129
 M = int((n-1)/2)
 k = 0.1
@@ -44,8 +46,6 @@ def compute_delta_array(tao=0.2):
     numerical_tao = mnc.getPriceTao(0.2)
     delta = analytical_tao - numerical_tao
     return delta
-
-
 
 def plotDelta(X_grid, delta, tao=0.2):
     # plot
