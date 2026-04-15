@@ -23,7 +23,7 @@ class MertonNumericalClass:
         
         # Grid step sizes
         self.h = (2.0 * self.x_star) / (self.n - 1)  
-        self.k = self.T / (self.q - 1)               
+        self.k = self.T / self.N
         
         # Spatial grid (X[0] is -x* and X[n-1] is x*)
         self.X = np.linspace(-self.x_star, self.x_star, self.n)
@@ -42,7 +42,6 @@ class MertonNumericalClass:
         C = np.zeros((self.n, self.n))
         alpha = (self.k * self.sigma**2) / (2.0 * self.h**2)
         beta = self.k * (self.r - 0.5 * self.sigma**2 - self.lam * self.zeta) / (2.0 * self.h)
-
         # Loop through strictly interior nodes
         for i in range(1, self.n - 1):
             C[i, i-1] = -alpha - beta                # Lower diagonal
@@ -104,12 +103,23 @@ class MertonNumericalClass:
         # Array of option prices at t=0
         return self.u[-1, :]
     
+    def getPriceTaoX0(self,tao):
+        # Array of option prices at time to maturity tao=T-t
+        if(tao==0): # tao=0,  t=T-tao=T
+            return self.getPriceMaturity()[self.M]
+        else:
+            return self.u[int(round(tao/self.k)), :][self.M]
+        
     def getPriceTao(self, tao):
-        # Array of option prices at time to maturity tao=tao
-        return self.u[int(tao*self.N), :]
+        # Array of option prices at time to maturity tao=T-t
+        if(tao==0): # tao=0,  t=T-tao=T
+            return self.getPriceMaturity()
+        else:
+            return self.u[int(round(tao/self.k)), :]
     
     def getPriceMaturity(self):
-        return np.maximum(self.S_grid - self.K, 0.0)
+        # payoff at time t=T
+        return np.maximum(self.S - self.K, 0.0)
         # OR self.u[0]
     
     def getNumericalSolutionMatrix(self):
