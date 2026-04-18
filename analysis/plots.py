@@ -11,7 +11,7 @@ def plot_option_price(X, u_final, K, save_path=None):
    """
    S = np.exp(X)
    payoff = np.maximum(S - K, 0.0)
-   ax = plt.subplots(figsize=(7, 4))
+   fig, ax = plt.subplots(figsize=(7, 4))
    ax.plot(S, payoff,  '--', color='steelblue', label='Payoff $(t=T)$')
    ax.plot(S, u_final, '-',  color='darkorange', label='Option value $(t=0)$')
    ax.axvline(K, color='gray', linestyle=':', alpha=0.6, label=f'Strike $K={K}$')
@@ -34,7 +34,7 @@ def plot_convergence(results, save_path=None):
    hs     = [r['h']     for r in results]
    errors = [r['error'] for r in results]
 
-   ax = plt.subplots(figsize=(7, 4))
+   fig, ax = plt.subplots(figsize=(7, 4))
    ax.loglog(hs, errors, 'o-', color='darkorange', label='Error at $x_K$')
 
    h0, e0 = hs[0], errors[0]
@@ -61,7 +61,7 @@ def plot_error_profile(X, u_final, fn_analytical, params, save_path=None):
    u_exact = np.array([fn_analytical(S0=s, n_terms=50, **params) for s in S])
 
    error = u_final - u_exact
-   ax = plt.subplots(figsize=(7, 4))
+   fig,ax = plt.subplots(figsize=(7, 4))
    ax.plot(X, error, color='darkorange')
    ax.axhline(0, color='gray', linestyle='--', alpha=0.5)
    ax.axvline(np.log(K), color='gray', linestyle=':', alpha=0.5, label=f'$x_K = \\ln K = {np.log(K):.2f}$')
