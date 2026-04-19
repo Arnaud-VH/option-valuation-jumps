@@ -51,14 +51,14 @@ def plot_convergence(results, save_path=None):
       plt.savefig(save_path, dpi=150)
    plt.show()
 
-def plot_error_profile(X, u_final, fn_analytical, params, save_path=None):
+def plot_error_profile(X, u_final, fn_analytical, model, params, save_path=None):
    """
    Plots the spatial error u_num - u_analytical across domain, recreating figure 1 from paper. 
    """
    S = np.exp(X)
    K = params['K']
    
-   u_exact = np.array([fn_analytical(S0=s, n_terms=50, **params) for s in S])
+   u_exact = np.array([fn_analytical(model=model, S0=s, K=K, T=params['T'], r=params['r'], n_terms=50) for s in S])
 
    error = u_final - u_exact
    fig,ax = plt.subplots(figsize=(7, 4))

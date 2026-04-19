@@ -1,35 +1,28 @@
-from models.merton import merton_analytical
-from merton_numerical_class import MertonNumericalClass
+from models.merton import MertonModel, merton_analytical
+from solvers.fd_solver import solve
 import numpy as np
 
-# compare single result with the analytical solution
-def computeError_X0(M=64,N=10,tao=0.2,maturity=1.0,sigma=0.2,lam=0.1,K=1.0,r=0.0,mu_J=0.0,sigma_J=0.5):
-    analytical = merton_analytical(
-        S0=1, 
-        K=K, 
-        T=tao, 
-        r=r,
-        sigma=sigma, 
-        lam=lam, 
-        mu_J=mu_J, 
-        sigma_J=sigma_J
-    )
-    mnc = MertonNumericalClass(
-        K=K, 
-        T=maturity, 
-        r=r, 
-        sigma=sigma, 
-        lam=lam, 
-        sigma_J=sigma_J, 
-        mu_J=mu_J,
-        M=M, 
-        N=N
-    )
-    if maturity==tao:
-        numerical = mnc.getPriceMaturity()[mnc.M]
-    else:
-        numerical = mnc.getPriceTaoX0(tao)
-    delta = analytical - numerical
-    return delta
+def compute_error_at_money(M=64, N=10, T=1.0, K=1.0, r=0.0):
+    """
+    Compares the FD numerical price to the analytical price at x=0 (S=K).
+    Returns the difference.
+    """
+    model = MertonModel(sigma=0.2, lam=0.1, mu_J=0.0, sigma_J=0.5)
 
-print(computeError_X0())
+    analytical = merton_analytical(model=model, S0=K, K=K, T=T, r=r)
+
+    X, u_final = solve(model=model, K=K, T=T, r=r, M=M, N=N)
+
+    # Find the grid point closest to x=0 (at the money)
+    atm_index = np.argmin(np.abs(X))
+    numerical = u_final[atm_index]
+
+    error = analytical - numerical
+    print(f"Analytical:  {analytical:.10f}")
+    print(f"Numerical:   {numerical:.10f}")
+    print(f"Error:       {error:.2e}")
+    return error
+
+compute_error_at_money()
+
+#From root --> python -m tests.error_infinite_norm

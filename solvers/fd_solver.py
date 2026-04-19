@@ -27,7 +27,7 @@ def solve(model: JumpDiffusionModel,K, T, r, M=64, N=20, x_star=4.0):
    u_final : Array of option prices at t=0
    """
    # 1. Model compensator
-   zeta = model.compensator()
+   zeta = model.zeta
 
    # 2. Space-Time Grid Setup
    n = 2 * M + 1             # Total number of spatial points

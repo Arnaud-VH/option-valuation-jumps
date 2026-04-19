@@ -29,7 +29,13 @@ def _run_merton():
 
     #Convergence study
     print("--- Merton: Running convergence study ---\n")
-    analytical = merton_analytical(S0=MERTON_PARAMS['K'], **MERTON_PARAMS)
+    analytical = merton_analytical(
+        model=MERTON_MODEL,
+        S0=MERTON_PARAMS['K'],
+        K=MERTON_PARAMS['K'],
+        T=MERTON_PARAMS['T'],
+        r=MERTON_PARAMS['r'],
+    )
     results = run_convergence_analysis(
         model=MERTON_MODEL,
         K=MERTON_PARAMS['K'],
@@ -44,7 +50,7 @@ def _run_merton():
 
     #Spatial error
     print("--- Merton: Generating spatial error profile ---\n")
-    plot_error_profile(X, u_final, merton_analytical, MERTON_PARAMS)
+    plot_error_profile(X, u_final, merton_analytical, MERTON_MODEL, MERTON_PARAMS)
 
 
 def _run_kou():
@@ -64,14 +70,9 @@ def _run_kou():
     #Kou's convergence study
     print("--- Kou: convergence study ---\n")
     analytical = kou_analytical(
+        model=KOU_MODEL,
         x_K=np.log(KOU_PARAMS['K']),
         tau=KOU_PARAMS['T'],
-        sigma=KOU_PARAMS['sigma'],
-        lam=KOU_PARAMS['lam'],
-        p=KOU_PARAMS['p'],
-        alpha1=KOU_PARAMS['alpha1'],
-        alpha2=KOU_PARAMS['alpha2'],
-        zeta=KOU_MODEL.compensator(),
         r=KOU_PARAMS['r'],
     )
     results = run_convergence_analysis(

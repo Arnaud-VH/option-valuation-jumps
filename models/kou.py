@@ -28,12 +28,12 @@ class KouModel(JumpDiffusionModel):
    def lam(self):
       return self._lam
    
-   def compensator(self):
+   def _compute_compensator(self):
       """
       zeta = E[e^Y - 1] for double exponential y
       referencing eq 9 in the paper. 
       """
-      return (((self.p * self.alpha1) / (self.alpha1 - 1.0)) + ((self.q * self.alpha2) / (self.alpha2 + 1.0)) - 1.0)
+      return (self.p * self.alpha1 / (self.alpha1 - 1.0) + self.q * self.alpha2 / (self.alpha2 + 1.0) - 1.0)
    
    def jump_density(self, y):
       """
@@ -52,21 +52,21 @@ class KouModel(JumpDiffusionModel):
    def right_boundary(self, x_star, K, r, tau):
       return np.exp(x_star) - K * np.exp(-r * tau)
    
-def kou_analytical(x_K, tau, sigma, lam, p, alpha1, alpha2, zeta, r=0.0, n_points=512, rho=1.5):
+def kou_analytical(model, x_K, tau, r=0.0, n_points=512, rho=1.5):
    """
    European call price under Kou's model following the Almendral & Oosterlee (2005) paper. 
    Follows with Equations (65) and (66) of the paper. 
    """
-   q = 1.0 - p
+   q = 1.0 - model.p
 
    def levy_exponent(z):
       """
       Levy-Khintchine exponent from equation (66).
       """
-      diffusion = -0.5 * sigma**2 * z**2
+      diffusion = -0.5 * model.sigma**2 * z**2
       #Use of imaginary number 1j here. 
-      drift = -(lam * zeta + 0.5 * sigma**2) * 1j * z
-      jump = lam * ((p * alpha1) / (alpha1 - 1j * z) + (q * alpha2) / (alpha2 + 1j * z) - 1.0)
+      drift = -(model.lam * model.zeta + 0.5 * model.sigma**2) * 1j * z
+      jump = model.lam * ((model.p * model.alpha1) / (model.alpha1 - 1j * z) + (q * model.alpha2) / (model.alpha2 + 1j * z) - 1.0)
       return diffusion + drift + jump
    
    #Use Simpon's rule for the integral as mentioned in paper. 

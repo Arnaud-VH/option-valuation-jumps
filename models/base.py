@@ -4,6 +4,7 @@ All models must implement these methods to work with the FD solver.
 """
 
 from abc import ABC, abstractmethod
+from functools import cached_property
 
 class JumpDiffusionModel(ABC):
    """
@@ -33,12 +34,15 @@ class JumpDiffusionModel(ABC):
       """
       pass
    
+   @cached_property
+   def zeta(self):
+      """Compensator E[e^Y - 1]. Computed once from _compute_compensator()."""
+      return self._compute_compensator()
+
    @abstractmethod
-   def compensator(self):
-      """
-      Returns zeta = E[e^Y - 1], the jump compenstor. 
-      Ensures the discounted asset price is a martingale
-      """
+   def _compute_compensator(self):
+      """Subclasses implement the actual compensator formula here."""
+      pass
 
    @abstractmethod
    def jump_density(self, y):
