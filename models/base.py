@@ -12,7 +12,7 @@ class JumpDiffusionModel(ABC):
    to be compatible with the FD solver. 
 
    Subclasses must implement the following functions:
-      - compensator()
+      - _compute_compensator()
       - jump_density(y)
       - tail_correction(tau, xi, x_star, K, r)
       - right_boundary(x_star, K, r, tau) 

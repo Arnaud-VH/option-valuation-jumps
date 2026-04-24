@@ -8,6 +8,7 @@ from model_config import (
     KOU_MODEL, CONVERGENCE_CONFIGS, X_STAR, MERTON_MODEL,
 )
 from solvers.fd_solver import solve
+from solvers.fft_solver import solve_fft
 from analysis.convergence import run_convergence_analysis, print_convergence_table
 from analysis.plots import plot_convergence, plot_option_price, plot_error_profile
 from models.merton import merton_analytical
@@ -17,7 +18,7 @@ from models.kou import kou_analytical
 def _run_merton():
     #Option Price plot
     print("--- Merton: Running FD solver for option price plot ---\n")
-    X, u_final = solve(
+    X, u_final = solve_fft(
         model=MERTON_MODEL, 
         K=MERTON_PARAMS['K'], 
         T=MERTON_PARAMS['T'], 
