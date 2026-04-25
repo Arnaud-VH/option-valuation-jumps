@@ -27,7 +27,7 @@ def plot_option_price(X, u_final, K, save_path=None):
       plt.savefig(save_path, dpi=150)
    plt.show()
 
-def plot_convergence(results, save_path=None):
+def plot_convergence(results, title, save_path=None):
    """
    log-log plot of error vs h, with reference slope-2 line.
    """
@@ -43,7 +43,7 @@ def plot_convergence(results, save_path=None):
 
    ax.set_xlabel('Spatial step $h$')
    ax.set_ylabel('Error $|u^h(x_K) - u(x_K)|$')
-   ax.set_title('Convergence of FD scheme')
+   ax.set_title(title)
    ax.legend()
    ax.grid(True, alpha=0.3, which='both')
    plt.tight_layout()
@@ -51,7 +51,7 @@ def plot_convergence(results, save_path=None):
       plt.savefig(save_path, dpi=150)
    plt.show()
 
-def plot_error_profile(X, u_final, fn_analytical, model, params, save_path=None):
+def plot_error_profile(X, u_final, fn_analytical, model, params, title, save_path=None):
    """
    Plots the spatial error u_num - u_analytical across domain, recreating figure 1 from paper. 
    """
@@ -67,7 +67,7 @@ def plot_error_profile(X, u_final, fn_analytical, model, params, save_path=None)
    ax.axvline(np.log(K), color='gray', linestyle=':', alpha=0.5, label=f'$x_K = \\ln K = {np.log(K):.2f}$')
    ax.set_xlabel('Log-price $x$')
    ax.set_ylabel('Error $u^h - u$')
-   ax.set_title('Spatial error profile')
+   ax.set_title(title)
    ax.legend()
    ax.grid(True, alpha=0.3)
    plt.tight_layout()

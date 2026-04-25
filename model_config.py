@@ -11,7 +11,7 @@ MERTON_PARAMS = dict(
    r = 0.0, 
    sigma = 0.2, 
    lam = 0.1, 
-   mu_J = 0.1,
+   mu_J = 0.0,
    sigma_J = 0.5,
 )
 
@@ -22,8 +22,8 @@ MERTON_MODEL = MertonModel(
    sigma_J = MERTON_PARAMS['sigma_J'],
 )
 
-X_STAR = 6.0 #Truncation point
-N_TERMS = 10 #Terms in Merton analytical series
+X_STAR = 4.0 #Truncation point
+N_TERMS = 50 #Terms in Merton analytical series
 
 CONVERGENCE_CONFIGS = [
    (32, 5), 

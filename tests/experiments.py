@@ -47,11 +47,11 @@ def _run_merton():
         x_star=X_STAR,
     )
     print_convergence_table(analytical, results)
-    plot_convergence(results)
+    plot_convergence(results, "Convergence of Merton FD Scheme")
 
     #Spatial error
     print("--- Merton: Generating spatial error profile ---\n")
-    plot_error_profile(X, u_final, merton_analytical, MERTON_MODEL, MERTON_PARAMS)
+    plot_error_profile(X, u_final, merton_analytical, MERTON_MODEL, MERTON_PARAMS, "Merton Spatial Error Profile")
 
 
 def _run_kou():
@@ -86,7 +86,7 @@ def _run_kou():
         x_star=6.0,
     )
     print_convergence_table(analytical, results)
-    plot_convergence(results)
+    plot_convergence(results, "Convergence of Kou FD Scheme")
 
 
 def run_all():
