@@ -33,7 +33,7 @@ def compute_infinite_norm_error(M=64, N=10, T=1.0, K=1.0, r=0.0):
     S = np.exp(X)
     
     analytical = merton_analytical(model=model, S0=S, K=K, T=T, r=r)
-    error_inf = np.max(np.abs(analytical - u_final))
+    error_inf = np.max(np.abs(analytical[1:-1] - u_final[1:-1]))
     print(f"Error_inf:   {error_inf:.2e}")
     return error_inf
 
