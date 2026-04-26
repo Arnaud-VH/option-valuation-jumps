@@ -7,8 +7,8 @@ bs = bs_call(S=1.0, K=1.0, T=1.0, r=0.0, sigma=0.2)
 model = MertonModel(sigma=0.2, lam=0.0, mu_J=0.0, sigma_J=0.5)
 merton = merton_analytical(model=model, S0=1.0, K=1.0, T=1.0, r=0.0)
 
-print(f"Black Scholes: {bs}")
-print(f"Merton: {merton}")
-print(f"Difference: {abs(bs - merton)}")
+print(f"Black Scholes: {bs:.8f}")
+print(f"Merton: {merton:.8f}")
+print(f"Difference: {abs(bs - merton):.4f}")
 
 #To run this you should use --> python -m tests.test_merton -- from the project root
