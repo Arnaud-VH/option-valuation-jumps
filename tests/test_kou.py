@@ -1,7 +1,5 @@
 from models.black_scholes import bs_call
 from models.kou import KouModel, kou_analytical
-from solvers.fd_solver import solve
-import numpy as np
 
 bs = bs_call(S=1.0, K=1.0, T=1.0, r=0.0, sigma=0.2)
 
@@ -16,3 +14,5 @@ kou_price = kou_analytical(
 print(f"Black Scholes: {bs:.8f}")
 print(f"Kou Analytical: {kou_price:.8f}")
 print(f"Difference: {abs(bs - kou_price):.4f}")
+
+#To run this you should use --> python -m tests.test_kou -- from the project root

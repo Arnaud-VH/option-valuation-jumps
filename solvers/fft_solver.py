@@ -30,7 +30,7 @@ def solve_fft(model: JumpDiffusionModel, K, T, r, M=64, N=20, x_star=4.0, tol=1e
     """
     zeta = model.zeta
 
-    # Grid setup (identical to fd_solver)
+    # Grid setup 
     n = 2 * M + 1
     q = N + 1
     h = (2.0 * x_star) / (n - 1)
@@ -49,20 +49,16 @@ def solve_fft(model: JumpDiffusionModel, K, T, r, M=64, N=20, x_star=4.0, tol=1e
     # f_all[d + (n-1)] = f(d*h)
 
     # Build Q: tridiagonal part of A = w0*I + C + D 
-    # C is tridiagonal from the diffusion operator.
-    # D is dense from the jump integral, but its three main diagonals
+    # C is tridiagonal from the diffusion operator. D is dense from the jump integral, but its three main diagonals
 
-    # D's tridiagonal values: D[i,j] = -k*h*lam*f((j-i)*h)
-    # shift -1: f(-h)
-    d_m1 = -k * h * model.lam * f_all[n - 2]
-    # shift  0: f(0)     
-    d_0 = -k * h * model.lam * f_all[n - 1]
-    # shift +1: f(h)      
+    # D's tridiagonal values
+    d_m1 = -k * h * model.lam * f_all[n - 2]  
+    d_0 = -k * h * model.lam * f_all[n - 1]   
     d_p1 = -k * h * model.lam * f_all[n]  
 
     # Trapezoidal half-weight at boundaries (j=0 or j=n-1)
-    d_m1_boundary = d_m1 / 2.0   # used at i=1, j=0
-    d_p1_boundary = d_p1 / 2.0   # used at i=n-2, j=n-1
+    d_m1_boundary = d_m1 / 2.0
+    d_p1_boundary = d_p1 / 2.0
 
     q_lower = np.zeros(n) # Q[i, i-1] (without w0)
     q_main = np.zeros(n) # Q[i, i] (without w0)
@@ -78,36 +74,32 @@ def solve_fft(model: JumpDiffusionModel, K, T, r, M=64, N=20, x_star=4.0, tol=1e
         q_main[i] += d_0
 
         if i == 1:
-            q_lower[i] += d_m1_boundary    # j=0 is boundary: half weight
+            q_lower[i] += d_m1_boundary # j=0 is boundary: half weight
         else:
             q_lower[i] += d_m1
 
         if i == n - 2:
-            q_upper[i] += d_p1_boundary    # j=n-1 is boundary: half weight
+            q_upper[i] += d_p1_boundary # j=n-1 is boundary: half weight
         else:
             q_upper[i] += d_p1
 
-    # ── Build R: off-tridiagonal part of -D, as a Toeplitz matrix ──
-    # R is Toeplitz because it depends only on the shift d = j - i.
+    # Building R, off-tridiagonal part of -D, as a Toeplitz matrix
     r_toep = k * h * model.lam * f_all.copy()
-    # Zero out the three main diagonals (these are in Q, not R)
-    r_toep[n - 2] = 0.0     # shift d = -1
-    r_toep[n - 1] = 0.0     # shift d =  0
-    r_toep[n] = 0.0          # shift d = +1
 
-    # Circulant embedding:
-    # First column = [t_0, t_{-1}, ..., t_{-(n-1)}, t_{n-1}, ..., t_1]
-    # where t_d = r_toep[d + (n-1)]
+    # Zero out the three main diagonals (these are in Q, not R)
+    r_toep[n - 2] = 0.0  
+    r_toep[n - 1] = 0.0  
+    r_toep[n] = 0.0      
+
+    # Circulant embedding
     circ_col = np.concatenate([
-        r_toep[n - 1::-1], # t_0, t_{-1}, ..., t_{-(n-1)}
-        r_toep[2 * n - 2:n - 1:-1], # t_{n-1}, ..., t_1
+        r_toep[n - 1::-1],
+        r_toep[2 * n - 2:n - 1:-1],
     ])
     # Precompute FFT of circulant column (done once, reused every iteration)
     r_hat = np.fft.fft(circ_col)
 
     # Boundary trapezoidal correction vectors
-    # The pure Toeplitz R uses full weight at all columns, but D has half-weight at j=0 and j=n-1 (composite trapezoidal rule).
-    # So we must subtract 0.5 * k*h*lam*f((j-i)*h)*v[j] at boundaries for entries where |i-j| > 1 (i.e., entries that are in R, not Q).
     f_corr_left = np.zeros(n) # correction for j = 0
     f_corr_right = np.zeros(n) # correction for j = n-1
     for i in range(1, n - 1):
@@ -131,9 +123,6 @@ def solve_fft(model: JumpDiffusionModel, K, T, r, M=64, N=20, x_star=4.0, tol=1e
 
         # Banded matrix for Q (add w0 to diagonal)
         # Format for solve_banded with (lower=1, upper=1):
-        #   ab[0, j] = Q[j-1, j]   (superdiagonal)
-        #   ab[1, j] = Q[j, j]     (main diagonal)
-        #   ab[2, j] = Q[j+1, j]   (subdiagonal)
         ab = np.zeros((3, n))
         ab[0, 1:] = q_upper[:-1]
         ab[1, :] = w0 + q_main
@@ -151,7 +140,7 @@ def solve_fft(model: JumpDiffusionModel, K, T, r, M=64, N=20, x_star=4.0, tol=1e
         b[0] = 0.0
         b[-1] = w0 * model.right_boundary(x_star, K, r, tau_m)
 
-        # ── Splitting iteration (eq. 48): Q v^{l+1} = R v^l + b ──
+        # Splitting iteration
         v = np.zeros(n)
 
         for iteration in range(max_iter):
