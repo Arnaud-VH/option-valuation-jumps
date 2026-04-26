@@ -22,7 +22,22 @@ def compute_error_at_money(M=64, N=10, T=1.0, K=1.0, r=0.0):
     print(f"Numerical:   {numerical:.10f}")
     print(f"Error:       {error:.2e}")
     return error
+    
+def compute_infinite_norm_error(M=64, N=10, T=1.0, K=1.0, r=0.0):
+    """
+    Returns the infinite norm
+    """
+    model = MertonModel(sigma=0.2, lam=0.1, mu_J=0.0, sigma_J=0.5)
+    
+    X, u_final = solve(model=model, K=K, T=T, r=r, M=M, N=N)
+    S = np.exp(X)
+    
+    analytical = merton_analytical(model=model, S0=S, K=K, T=T, r=r)
+    error_inf = np.max(np.abs(analytical_all - u_final))
+    
+    return error_inf
 
 compute_error_at_money()
+compute_infinite_norm_error()
 
 #From root --> python -m tests.error_infinite_norm
